@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Post-install script for Log Viewer
+# This script runs after the package is installed
+
+# Set permissions for the app
+chmod +x "/Applications/Log Viewer.app/Contents/MacOS/Log Viewer"
+
+# Create file associations
+# Register the app to handle log files
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "/Applications/Log Viewer.app"
+
+# Set file associations for common log file types
+defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.log";LSHandlerRoleAll="com.logviewer.app";}'
+defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.plain-text";LSHandlerRoleAll="com.logviewer.app";}'
+defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.json";LSHandlerRoleAll="com.logviewer.app";}'
+defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.xml";LSHandlerRoleAll="com.logviewer.app";}'
+defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add '{LSHandlerContentType="public.comma-separated-values-text";LSHandlerRoleAll="com.logviewer.app";}'
+
+# Update Launch Services database
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user
+
+echo "Log Viewer has been installed successfully!"
+echo "You can now right-click on .log, .txt, .json, .xml, and .csv files to open them with Log Viewer."
