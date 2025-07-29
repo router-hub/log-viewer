@@ -1,0 +1,73 @@
+{
+  "name": "log-viewer-app",
+  "version": "1.0.0",
+  "description": "A powerful log viewer application built with Electron and React",
+  "main": "app/main.js",
+  "homepage": "./",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:react\" \"wait-on http://localhost:5173 && npm run dev:electron\"",
+    "dev:react": "vite",
+    "dev:electron": "cross-env NODE_ENV=development electron .",
+    "build": "vite build",
+    "start": "npm run build && electron .",
+    "setup": "node dev-setup.js",
+    "package": "node package-app.js",
+    "build-all": "node build-all-platforms.js",
+    "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win portable",
+    "dist:mac": "npm run build && electron-builder --mac dir",
+    "dist:linux": "npm run build && electron-builder --linux dir",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "com.logviewer.app",
+    "productName": "Log Viewer",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "app/**/*",
+      "dist/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "portable"
+    },
+    "mac": {
+      "target": "dir"
+    },
+    "linux": {
+      "target": "dir"
+    }
+  },
+  "keywords": [
+    "log",
+    "viewer",
+    "electron",
+    "react",
+    "monaco",
+    "editor"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "lucide-react": "^0.294.0",
+    "monaco-editor": "^0.45.0",
+    "postcss": "^8.4.32",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^3.3.6",
+    "vite": "^5.0.8",
+    "wait-on": "^7.2.0",
+    "zustand": "^4.4.7"
+  }
+}
