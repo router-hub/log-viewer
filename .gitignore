@@ -9,8 +9,10 @@ dist/
 dist-app/
 distribution/
 
-# Allow MSI installer for downloads
+# Allow installers for downloads
 !dist-electron/*.msi
+!dist-electron/*.pkg
+!dist-electron/*.deb
 
 # Environment variables
 .env

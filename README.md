@@ -21,10 +21,14 @@ A modern, feature-rich log viewer application built with Electron, React, and Mo
 - Right-click any log file → "Open with LogFocus"
 
 ### macOS
-- Coming soon...
+- **PKG Installer**: [LogFocus-1.0.0-arm64.pkg](dist-electron/LogFocus-1.0.0-arm64.pkg) (90MB)
+- Download and run the installer
+- Right-click any log file → "Open with LogFocus"
 
 ### Linux
-- Coming soon...
+- **DEB Package**: [logfocus_1.0.0_arm64.deb](dist-electron/logfocus_1.0.0_arm64.deb) (65MB)
+- Download and install: `sudo dpkg -i logfocus_1.0.0_arm64.deb`
+- Right-click any log file → "Open with LogFocus"
 
 ## Installation
 
