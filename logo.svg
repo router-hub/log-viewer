@@ -1,0 +1,22 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="30" fill="#1f2937" stroke="#3b82f6" stroke-width="2"/>
+  
+  <!-- Document icon -->
+  <rect x="16" y="12" width="24" height="32" rx="2" fill="#6b7280" stroke="#9ca3af" stroke-width="1"/>
+  <rect x="18" y="16" width="16" height="1" fill="#d1d5db"/>
+  <rect x="18" y="19" width="12" height="1" fill="#d1d5db"/>
+  <rect x="18" y="22" width="14" height="1" fill="#d1d5db"/>
+  <rect x="18" y="25" width="10" height="1" fill="#d1d5db"/>
+  <rect x="18" y="28" width="16" height="1" fill="#d1d5db"/>
+  <rect x="18" y="31" width="8" height="1" fill="#d1d5db"/>
+  
+  <!-- Eye icon (focus) -->
+  <ellipse cx="32" cy="32" rx="8" ry="4" fill="#3b82f6" opacity="0.8"/>
+  <circle cx="32" cy="32" r="2" fill="#ffffff"/>
+  <circle cx="32" cy="32" r="1" fill="#1f2937"/>
+  
+  <!-- Highlight effect -->
+  <path d="M28 36 L36 36 L36 38 L28 38 Z" fill="#fbbf24" opacity="0.9"/>
+  <path d="M26 40 L38 40 L38 42 L26 42 Z" fill="#ef4444" opacity="0.9"/>
+</svg> 

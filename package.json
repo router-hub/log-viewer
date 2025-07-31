@@ -1,7 +1,7 @@
 {
-  "name": "log-viewer-app",
+  "name": "logfocus",
   "version": "1.0.0",
-  "description": "A powerful log viewer application built with Electron and React",
+  "description": "A modern log viewer with advanced highlighting and filtering capabilities",
   "main": "app/main.js",
   "homepage": "./",
   "scripts": {
@@ -15,36 +15,56 @@
     "build-all": "node build-all-platforms.js",
     "dist": "npm run build && electron-builder",
     "dist:win": "npm run build && electron-builder --win portable",
+    "dist:msi": "npm run build && electron-builder --win msi",
     "dist:mac": "npm run build && electron-builder --mac pkg",
-    "dist:linux": "npm run build && electron-builder --linux dir",
+    "dist:linux": "npm run build && electron-builder --linux",
     "postinstall": "electron-builder install-app-deps"
   },
   "build": {
-    "appId": "com.logviewer.app",
-    "productName": "Log Viewer",
+    "appId": "com.logfocus.app",
+    "productName": "LogFocus",
     "directories": {
       "output": "dist-electron"
     },
+    "icon": "logo.png",
     "files": [
       "app/**/*",
       "dist/**/*",
       "node_modules/**/*",
       "package.json"
     ],
+
     "win": {
-      "target": "portable"
+      "icon": "logo.ico",
+      "target": [
+        {
+          "target": "msi",
+          "arch": ["x64"]
+        }
+      ]
     },
+
     "mac": {
-      "target": "pkg",
+      "icon": "logo.ico",
+      "target": [
+        "dmg",
+        "pkg"
+      ],
       "category": "public.app-category.developer-tools",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist"
     },
+
     "linux": {
-      "target": "dir"
+      "target": [
+        "deb",
+        "rpm"
+      ],
+      "icon": "logo.png"
     },
+
     "pkg": {
       "scripts": "build/pkg-scripts"
     }
@@ -57,7 +77,10 @@
     "monaco",
     "editor"
   ],
-  "author": "Your Name",
+  "author": {
+    "name": "Aditya Mani Tiwari",
+    "email": "adityamanitiwari5@gmail.com"
+  },
   "license": "MIT",
   "devDependencies": {
     "@types/react": "^18.2.43",

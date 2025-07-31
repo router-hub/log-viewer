@@ -11,7 +11,9 @@ const Editor = () => {
     updateTab, 
     wrapMode, 
     highlightRules,
-    theme 
+    theme,
+    showContextMenu,
+    hideContextMenu
   } = useStore();
 
   const activeTab = getActiveTab();
@@ -44,6 +46,7 @@ const Editor = () => {
       lineNumbers: 'on',
       renderWhitespace: 'none',
       automaticLayout: true,
+      contextmenu: false, // Disable default context menu
     });
 
     // Store editor instance with its container
@@ -57,6 +60,43 @@ const Editor = () => {
           content: editor.getValue(),
           isDirty: true 
         });
+      }
+    });
+
+    // Handle right-click context menu with mouse events
+    editorContainer.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      
+      const selection = editor.getSelection();
+      if (selection && !selection.isEmpty()) {
+        const selectedText = editor.getModel().getValueInRange(selection);
+        if (selectedText.trim()) {
+          // Get the mouse position relative to the viewport
+          const rect = editorContainer.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          
+          // Convert to absolute position
+          const absoluteX = e.clientX;
+          const absoluteY = e.clientY;
+          
+          showContextMenu(absoluteX, absoluteY, selectedText);
+        }
+      }
+    });
+
+    // Also handle the Monaco editor's context menu event as backup
+    editor.onContextMenu((e) => {
+      if (e && typeof e.preventDefault === 'function') {
+        e.preventDefault();
+      }
+      
+      const selection = editor.getSelection();
+      if (selection && !selection.isEmpty()) {
+        const selectedText = editor.getModel().getValueInRange(selection);
+        if (selectedText.trim()) {
+          showContextMenu(e.event.posx, e.event.posy, selectedText);
+        }
       }
     });
 
@@ -94,6 +134,30 @@ const Editor = () => {
     editor.setPosition({ lineNumber: targetLine, column: 1 });
     editor.revealLineInCenter(targetLine);
     editor.focus();
+  };
+
+  // Helper function to escape regex special characters
+  const escapeRegex = (str) => {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  };
+
+  // Helper function to validate and create regex
+  const createValidRegex = (pattern, caseSensitive) => {
+    try {
+      // If the pattern is already a valid regex, use it as is
+      if (pattern.startsWith('/') && pattern.endsWith('/')) {
+        const flags = pattern.slice(pattern.lastIndexOf('/') + 1);
+        const regexPattern = pattern.slice(1, pattern.lastIndexOf('/'));
+        return new RegExp(regexPattern, caseSensitive ? 'g' : 'gi');
+      }
+      
+      // Otherwise, escape the pattern and create regex
+      const escapedPattern = escapeRegex(pattern);
+      return new RegExp(escapedPattern, caseSensitive ? 'g' : 'gi');
+    } catch (error) {
+      console.error('Invalid regex pattern:', pattern, error);
+      return null;
+    }
   };
 
   // Handle active tab changes
@@ -146,40 +210,77 @@ const Editor = () => {
 
     const { editor } = editorsRef.current.get(activeTab.id);
     
+    console.log('🔍 === HIGHLIGHTING DEBUG ===');
+    console.log('🔍 Rules:', highlightRules.length, 'Content length:', activeTab.content?.length);
+    
+    // Generate dynamic CSS for current rules
+    const generateDynamicCSS = () => {
+      const styleId = 'dynamic-highlight-styles';
+      let existingStyle = document.getElementById(styleId);
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+      
+      const style = document.createElement('style');
+      style.id = styleId;
+      
+      const cssRules = highlightRules.map(rule => `
+        .highlight-${rule.id} {
+          background-color: ${rule.color} !important;
+          color: #ffffff !important;
+          font-weight: bold !important;
+        }
+      `).join('\n');
+      
+      style.textContent = cssRules;
+      document.head.appendChild(style);
+    };
+    
+    // Generate CSS for current rules
+    generateDynamicCSS();
+    
     // Clear existing decorations
     const decorations = editor.deltaDecorations([], []);
 
     // Apply highlight rules
+    let totalMatches = 0;
     const newDecorations = highlightRules.map(rule => {
-      try {
-        const regex = new RegExp(rule.regex, rule.caseSensitive ? 'g' : 'gi');
-        const matches = [];
-        const text = activeTab.content;
-        let match;
+      const regex = createValidRegex(rule.regex, rule.caseSensitive);
+      if (!regex) {
+        console.log('❌ Invalid regex for rule:', rule.regex);
+        return [];
+      }
 
-        while ((match = regex.exec(text)) !== null) {
+      const matches = [];
+      const text = activeTab.content;
+      let match;
+
+      while ((match = regex.exec(text)) !== null) {
+        try {
           const startPos = editor.getModel().getPositionAt(match.index);
           const endPos = editor.getModel().getPositionAt(match.index + match[0].length);
           
           matches.push({
             range: new monaco.Range(startPos.lineNumber, startPos.column, endPos.lineNumber, endPos.column),
             options: {
-              inlineClassName: `highlight-${rule.id}`,
-              backgroundColor: rule.color,
-              color: '#ffffff'
+              inlineClassName: `highlight-${rule.id}`
             }
           });
+        } catch (error) {
+          console.error('❌ Error creating decoration for match:', match, error);
         }
-
-        return matches;
-      } catch (error) {
-        console.error('Invalid regex:', rule.regex, error);
-        return [];
       }
-    }).flat();
 
+      totalMatches += matches.length;
+      console.log(`✅ ${rule.regex}: ${matches.length} matches (${rule.color})`);
+      return matches;
+    }).flat();
+    
+    console.log('🔍 Total:', totalMatches, 'decorations applied');
+    
     // Apply decorations
-    editor.deltaDecorations(decorations, newDecorations);
+    const decorationIds = editor.deltaDecorations(decorations, newDecorations);
+    console.log('🔍 === END DEBUG ===');
   }, [activeTab, highlightRules]);
 
   // Listen for navigation events
@@ -211,8 +312,29 @@ const Editor = () => {
 
   if (!activeTab) {
     return (
-      <div className="flex items-center justify-center h-full text-gray-400">
-        <p>No file selected</p>
+      <div className="flex flex-col items-center justify-center h-full text-gray-400">
+        <div className="text-center">
+          <div className="mb-4">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="mx-auto">
+              <circle cx="32" cy="32" r="30" fill="#1f2937" stroke="#3b82f6" strokeWidth="2"/>
+              <rect x="16" y="12" width="24" height="32" rx="2" fill="#6b7280" stroke="#9ca3af" strokeWidth="1"/>
+              <rect x="18" y="16" width="16" height="1" fill="#d1d5db"/>
+              <rect x="18" y="19" width="12" height="1" fill="#d1d5db"/>
+              <rect x="18" y="22" width="14" height="1" fill="#d1d5db"/>
+              <rect x="18" y="25" width="10" height="1" fill="#d1d5db"/>
+              <rect x="18" y="28" width="16" height="1" fill="#d1d5db"/>
+              <rect x="18" y="31" width="8" height="1" fill="#d1d5db"/>
+              <ellipse cx="32" cy="32" rx="8" ry="4" fill="#3b82f6" opacity="0.8"/>
+              <circle cx="32" cy="32" r="2" fill="#ffffff"/>
+              <circle cx="32" cy="32" r="1" fill="#1f2937"/>
+              <path d="M28 36 L36 36 L36 38 L28 38 Z" fill="#fbbf24" opacity="0.9"/>
+              <path d="M26 40 L38 40 L38 42 L26 42 Z" fill="#ef4444" opacity="0.9"/>
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-300 mb-2">LogFocus</h1>
+          <p className="text-sm text-gray-500 mb-4">Modern log viewer with advanced highlighting</p>
+          <p className="text-xs text-gray-600">Open a file to get started</p>
+        </div>
       </div>
     );
   }
@@ -220,16 +342,6 @@ const Editor = () => {
   return (
     <div className="h-full">
       <div ref={containerRef} className="h-full" />
-      
-      {/* Highlight styles */}
-      <style>
-        {highlightRules.map(rule => `
-          .highlight-${rule.id} {
-            background-color: ${rule.color} !important;
-            color: #ffffff !important;
-          }
-        `).join('')}
-      </style>
     </div>
   );
 };

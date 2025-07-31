@@ -5,9 +5,15 @@ const fs = require('fs');
 let mainWindow;
 
 function createWindow() {
+  const iconPath = path.join(__dirname, '../build/icon.png');
+  console.log('🔍 Loading icon from:', iconPath);
+  console.log('🔍 Icon file exists:', require('fs').existsSync(iconPath));
+  
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    title: 'LogFocus',
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

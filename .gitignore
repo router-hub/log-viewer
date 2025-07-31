@@ -6,9 +6,11 @@ yarn-error.log*
 
 # Build outputs
 dist/
-dist-electron/
 dist-app/
 distribution/
+
+# Allow MSI installer for downloads
+!dist-electron/*.msi
 
 # Environment variables
 .env

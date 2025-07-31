@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import useStore from '../store/useStore';
-import { Plus, Trash2, Edit3, X } from 'lucide-react';
+import { Plus, Trash2, Edit3, X, HelpCircle } from 'lucide-react';
 
 const HighlightRuleEditor = () => {
   const { 
     highlightRules, 
     addHighlightRule, 
     removeHighlightRule, 
-    updateHighlightRule 
+    updateHighlightRule
   } = useStore();
 
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [showHelp, setShowHelp] = useState(false);
   const [newRule, setNewRule] = useState({
     regex: '',
     color: '#ef4444',
@@ -70,16 +71,54 @@ const HighlightRuleEditor = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-medium text-gray-300">Highlight Rules</h3>
-        {!isAdding && (
+        <div className="flex items-center space-x-2">
           <button
-            onClick={() => setIsAdding(true)}
-            className="flex items-center space-x-1 px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs"
+            onClick={() => setShowHelp(!showHelp)}
+            className="text-gray-400 hover:text-gray-300"
+            title="Show regex help"
           >
-            <Plus size={12} />
-            <span>Add Rule</span>
+            <HelpCircle size={14} />
           </button>
-        )}
+          {!isAdding && (
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setIsAdding(true)}
+                className="flex items-center space-x-1 px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs"
+              >
+                <Plus size={12} />
+                <span>Add Rule</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Help section */}
+      {showHelp && (
+        <div className="mb-4 p-3 bg-gray-700 rounded border border-gray-600">
+          <h4 className="text-xs font-medium text-gray-300 mb-2">Regex Examples:</h4>
+          <div className="space-y-2">
+            {regexExamples.map((example, index) => (
+              <div key={index} className="flex items-center justify-between text-xs">
+                <div className="flex-1">
+                  <div className="text-blue-400 font-medium">{example.name}</div>
+                  <div className="text-gray-400">{example.description}</div>
+                </div>
+                <button
+                  onClick={() => insertExample(example.pattern)}
+                  className="ml-2 px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded text-xs"
+                >
+                  Use
+                </button>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 text-xs text-gray-400">
+            <p><strong>Tip:</strong> For simple text matching, just type the text. For complex patterns, use regex syntax.</p>
+            <p><strong>Numbers:</strong> Use <code className="bg-gray-600 px-1 rounded">\d+</code> to match one or more digits.</p>
+          </div>
+        </div>
+      )}
 
       {/* Add/Edit Form */}
       {isAdding && (
@@ -87,13 +126,13 @@ const HighlightRuleEditor = () => {
           <div className="space-y-3">
             <div>
               <label className="block text-xs text-gray-300 mb-1">
-                Pattern (Regex)
+                Pattern (Regex or Text)
               </label>
               <input
                 type="text"
                 value={newRule.regex}
                 onChange={(e) => setNewRule({ ...newRule, regex: e.target.value })}
-                placeholder="Enter regex pattern..."
+                placeholder="Enter pattern (e.g., ERROR, \d+, [0-9]+)..."
                 className="w-full px-2 py-1 bg-gray-600 border border-gray-500 rounded text-sm text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-500"
               />
             </div>

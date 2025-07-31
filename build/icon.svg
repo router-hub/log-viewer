@@ -1,0 +1,22 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="#1f2937" stroke="#3b82f6" stroke-width="16"/>
+  
+  <!-- Document icon -->
+  <rect x="128" y="96" width="192" height="256" rx="16" fill="#6b7280" stroke="#9ca3af" stroke-width="8"/>
+  <rect x="144" y="128" width="128" height="8" fill="#d1d5db"/>
+  <rect x="144" y="152" width="96" height="8" fill="#d1d5db"/>
+  <rect x="144" y="176" width="112" height="8" fill="#d1d5db"/>
+  <rect x="144" y="200" width="80" height="8" fill="#d1d5db"/>
+  <rect x="144" y="224" width="128" height="8" fill="#d1d5db"/>
+  <rect x="144" y="248" width="64" height="8" fill="#d1d5db"/>
+  
+  <!-- Eye icon (focus) -->
+  <ellipse cx="256" cy="256" rx="64" ry="32" fill="#3b82f6" opacity="0.8"/>
+  <circle cx="256" cy="256" r="16" fill="#ffffff"/>
+  <circle cx="256" cy="256" r="8" fill="#1f2937"/>
+  
+  <!-- Highlight effect -->
+  <path d="M224 288 L288 288 L288 304 L224 304 Z" fill="#fbbf24" opacity="0.9"/>
+  <path d="M208 320 L304 320 L304 336 L208 336 Z" fill="#ef4444" opacity="0.9"/>
+</svg> 
